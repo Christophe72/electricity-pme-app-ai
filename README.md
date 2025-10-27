@@ -9,7 +9,8 @@
 - **Page d'accueil moderne et sobre (cyan)**
 - **Assistant IA** pour répondre aux questions sur le stock
 - **Base de données Prisma** (SQLite) avec seed de matériel récurrent
-- **Gestion des installations et du stock**
+- **Gestion des installations et du stock** (CRUD complet)
+- **Page de gestion interactive** : Ajout, modification, suppression des installations et articles de stock
 - **Seed automatique** : +50 articles électriques courants
 - **Design responsive avec Tailwind CSS v4**
 
@@ -45,6 +46,7 @@
 5. **Accéder à l'application**
    - Page d'accueil : [http://localhost:3000](http://localhost:3000)
    - Assistant IA : [http://localhost:3000/ai-stock](http://localhost:3000/ai-stock)
+   - Gestion des données : [http://localhost:3000/gestion](http://localhost:3000/gestion)
 
 ---
 
@@ -52,7 +54,10 @@
 
 - `app/page.tsx` : Feuille d'accueil sobre et responsive
 - `app/ai-stock/page.tsx` : Interface pour interroger l'IA sur le stock
+- `app/gestion/page.tsx` : Interface CRUD pour installations et stock
 - `app/api/ai/stock/route.ts` : Route API Next.js connectée à OpenAI et Prisma
+- `app/api/installations/route.ts` : API CRUD installations
+- `app/api/stock/route.ts` : API CRUD stock
 - `prisma/schema.prisma` : Modèles Installation et StockItem
 - `prisma/seed.ts` : Script de seed avec matériel électrique récurrent
 - `lib/prisma.ts` : Client Prisma pour Next.js
@@ -77,11 +82,12 @@ Le script `prisma/seed.ts` ajoute automatiquement plus de 50 articles courants p
 
 ---
 
-## 📝 À venir
+## 📝 Fonctionnalités récentes
 
-- Gestion visuelle du stock
+- Gestion visuelle du stock et des installations (CRUD)
 - Suivi des installations
-- Statistiques avancées
+- Alertes automatiques sur le stock
+- Statistiques à venir
 
 ---
 
