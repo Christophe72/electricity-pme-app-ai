@@ -1,17 +1,16 @@
-# ⚡ Electricity PME App
+# ⚡ Electricity PME App AI
 
-> Application Next.js pour la gestion de stock d'une société d'électricité, avec assistant IA et base de données Prisma.
+> Application Next.js pour la gestion de stock d'une société d'électricité, extraction PDF et assistant IA (OpenAI).
 
 ---
 
 ## 🚀 Fonctionnalités principales
 
-- **Page d'accueil moderne et sobre (cyan)**
-- **Assistant IA** pour répondre aux questions sur le stock
+- **Extraction de texte PDF** côté serveur (Node.js pur, sans dépendance DOM/canvas)
+- **Assistant IA** pour répondre aux questions sur le contenu du PDF
 - **Base de données Prisma** (SQLite) avec seed de matériel récurrent
 - **Gestion des installations et du stock** (CRUD complet)
-- **Page de gestion interactive** : Ajout, modification, suppression des installations et articles de stock
-- **Seed automatique** : +50 articles électriques courants
+- **Pages interactives** : accueil, IA PDF, IA stock, gestion
 - **Design responsive avec Tailwind CSS v4**
 
 ---
@@ -22,6 +21,7 @@
 
    ```bash
    npm install
+   npm install pdfreader
    ```
 
 2. **Configurer la base Prisma**
@@ -29,13 +29,12 @@
    ```bash
    npx prisma generate
    npx prisma db push
-   ```
-
-3. **Peupler le stock avec du matériel courant**
-
-   ```bash
    npm run seed
    ```
+
+3. **Placer votre PDF**
+
+   - Placez le fichier à analyser dans `/public/certification.pdf`
 
 4. **Lancer le serveur Next.js**
 
@@ -45,13 +44,46 @@
 
 5. **Accéder à l'application**
    - Page d'accueil : [http://localhost:3000](http://localhost:3000)
-   - Assistant IA : [http://localhost:3000/ai-stock](http://localhost:3000/ai-stock)
-   - Gestion des données : [http://localhost:3000/gestion](http://localhost:3000/gestion)
+   - Assistant IA PDF : [http://localhost:3000/ai-pdf](http://localhost:3000/ai-pdf)
+   - Assistant IA Stock : [http://localhost:3000/ai-stock](http://localhost:3000/ai-stock)
+   - Gestion : [http://localhost:3000/gestion](http://localhost:3000/gestion)
+
+---
+
+## 📄 Extraction PDF & IA
+
+- **Librairie utilisée** : [`pdfreader`](https://www.npmjs.com/package/pdfreader) (Node.js only)
+- **Fichier principal** : [`lib/pdf-helper.ts`](lib/pdf-helper.ts)
+- **API** : `/api/ai/pdf`
+  - Lit le PDF, extrait le texte, puis envoie le texte et la question à OpenAI pour obtenir une réponse.
+
+### Exemple d'extraction
+
+```typescript
+export async function parsePDF(dataBuffer: Buffer): Promise<PDFData> {
+  // ...voir le fichier pour l’implémentation complète
+}
+```
+
+- Le parsing est asynchrone, le texte est concaténé page par page.
+- Le nombre de pages est détecté automatiquement.
+
+---
+
+## 🤖 Assistant IA
+
+- Utilise l'API OpenAI pour répondre aux questions sur le PDF ou le stock.
+- Modèle utilisé : `gpt-4o-mini` (configurable)
+- Les réponses sont contextualisées avec le texte extrait du PDF ou la base Prisma.
 
 ---
 
 ## 🧩 Structure du projet
 
+- `app/ai-pdf/page.tsx` : Interface pour interroger l'IA sur le PDF
+- `app/api/ai/pdf/route.ts` : Route API Next.js pour extraction PDF + IA
+- `lib/pdf-helper.ts` : Extraction du texte PDF (Node.js only)
+- `public/certification.pdf` : Fichier PDF à analyser
 - `app/page.tsx` : Feuille d'accueil sobre et responsive
 - `app/ai-stock/page.tsx` : Interface pour interroger l'IA sur le stock
 - `app/gestion/page.tsx` : Interface CRUD pour installations et stock
@@ -64,30 +96,18 @@
 
 ---
 
-## 🤖 Assistant IA
-
-L'assistant utilise l'API OpenAI pour répondre aux questions sur le stock en temps réel, en s'appuyant sur les données de la base SQLite.
-
-Exemples de questions :
-
-- "Quels articles sont sous le seuil ?"
-- "Quels articles faut-il recommander ?"
-- "Fais-moi un résumé du stock."
-
----
-
 ## 📦 Seed du stock
 
-Le script `prisma/seed.ts` ajoute automatiquement plus de 50 articles courants pour une société d'électricité (câbles, disjoncteurs, prises, accessoires, etc.) et 2 installations exemples.
+- Script `prisma/seed.ts` : +50 articles électriques courants, 2 installations exemples
 
 ---
 
 ## 📝 Fonctionnalités récentes
 
+- Extraction PDF robuste (Node.js only)
+- Correction des erreurs liées à DOMMatrix/canvas
+- Assistant IA PDF et Stock
 - Gestion visuelle du stock et des installations (CRUD)
-- Suivi des installations
-- Alertes automatiques sur le stock
-- Statistiques à venir
 
 ---
 
@@ -96,6 +116,8 @@ Le script `prisma/seed.ts` ajoute automatiquement plus de 50 articles courants p
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Tailwind CSS v4](https://tailwindcss.com/docs/installation)
+- [pdfreader](https://www.npmjs.com/package/pdfreader)
+- [OpenAI](https://platform.openai.com/docs)
 
 ---
 
