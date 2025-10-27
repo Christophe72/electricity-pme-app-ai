@@ -6,10 +6,12 @@
 
 ## 🚀 Fonctionnalités principales
 
-- **Page d'accueil moderne et sobre**
+- **Page d'accueil moderne et sobre (cyan)**
 - **Assistant IA** pour répondre aux questions sur le stock
 - **Base de données Prisma** (SQLite) avec seed de matériel récurrent
 - **Gestion des installations et du stock**
+- **Seed automatique** : +50 articles électriques courants
+- **Design responsive avec Tailwind CSS v4**
 
 ---
 
