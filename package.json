@@ -13,9 +13,15 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.81",
     "@prisma/client": "^6.18.0",
+    "canvas": "^3.2.0",
     "next": "16.0.0",
     "openai": "^6.7.0",
+    "pdf-parse": "^2.4.5",
+    "pdf.js-extract": "^0.2.1",
+    "pdfjs-dist": "^5.4.296",
+    "pdfreader": "^3.0.7",
     "prisma": "^6.18.0",
     "react": "19.2.0",
     "react-dom": "19.2.0"
@@ -23,6 +29,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",

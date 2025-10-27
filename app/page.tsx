@@ -31,8 +31,8 @@ export default function Home() {
         </div>
 
         {/* Cartes de navigation */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {/* Assistant IA */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+          {/* Assistant IA Stock */}
           <Link href="/ai-stock">
             <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer border-2 border-transparent hover:border-cyan-500">
               <div className="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mb-4">
@@ -51,11 +51,38 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">
-                Assistant IA
+                Assistant IA Stock
               </h3>
               <p className="text-gray-600">
                 Posez des questions sur votre stock et obtenez des réponses
                 instantanées
+              </p>
+            </div>
+          </Link>
+
+          {/* Assistant IA PDF */}
+          <Link href="/ai-pdf">
+            <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer border-2 border-transparent hover:border-purple-500">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                <svg
+                  className="w-6 h-6 text-purple-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
+                Assistant IA PDF
+              </h3>
+              <p className="text-gray-600">
+                Posez des questions sur vos documents de certification
               </p>
             </div>
           </Link>
