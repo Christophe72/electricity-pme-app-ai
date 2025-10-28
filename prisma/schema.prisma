@@ -29,4 +29,40 @@ model StockItem {
   createdAt      DateTime      @default(now())
   installation   Installation? @relation(fields: [installationId], references: [id])
   installationId Int?
+  proposalItems  ProposalItem[]
+}
+
+model OrderProposal {
+  id          Int            @id @default(autoincrement())
+  status      ProposalStatus @default(DRAFT)
+  source      String?        // e.g., "threshold"
+  notes       String?
+  items       ProposalItem[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model ProposalItem {
+  id             Int           @id @default(autoincrement())
+  proposal       OrderProposal @relation(fields: [proposalId], references: [id])
+  proposalId     Int
+  stockItem      StockItem     @relation(fields: [stockItemId], references: [id])
+  stockItemId    Int
+  proposedQty    Int
+  approvedQty    Int?
+  status         ItemStatus    @default(PENDING)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+enum ProposalStatus {
+  DRAFT
+  VALIDATED
+  CANCELLED
+}
+
+enum ItemStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
