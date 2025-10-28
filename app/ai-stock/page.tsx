@@ -29,7 +29,7 @@ export default function AIStockPage() {
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="Exemple : Quels articles sont sous le seuil ?"
-          className="w-full p-4 border border-cyan-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 transition mb-4"
+          className="w-full p-4 border border-cyan-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 transition mb-4 text-amber-700"
           rows={3}
         />
         <button

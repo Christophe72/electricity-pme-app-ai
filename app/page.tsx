@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-linear-to-br from-cyan-50 to-blue-50">
+    <div className="min-h-screen bg-linear-to-br from-cyan-50 to-blue-50 dark:from-gray-900 dark:to-gray-950">
       <div className="container mx-auto px-4 py-16">
         {/* En-tête */}
         <div className="text-center mb-16">
@@ -21,20 +21,20 @@ export default function Home() {
               />
             </svg>
           </div>
-          <h1 className="text-5xl font-bold text-gray-800 mb-4">
+          <h1 className="text-5xl font-bold text-gray-800 dark:text-gray-100 mb-4">
             Gestion Électricité PME
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Gérez efficacement votre stock de matériel électrique avec
             l&apos;aide de l&apos;intelligence artificielle
           </p>
         </div>
 
         {/* Cartes de navigation */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto items-stretch">
           {/* Assistant IA Stock */}
-          <Link href="/ai-stock">
-            <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer border-2 border-transparent hover:border-cyan-500">
+          <Link href="/ai-stock" className="block h-full">
+            <div className="h-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer border-2 border-transparent hover:border-cyan-500 dark:hover:border-cyan-400 min-h-[220px]">
               <div className="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mb-4">
                 <svg
                   className="w-6 h-6 text-cyan-600"
@@ -50,10 +50,10 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
+              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                 Assistant IA Stock
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 Posez des questions sur votre stock et obtenez des réponses
                 instantanées
               </p>
@@ -61,8 +61,8 @@ export default function Home() {
           </Link>
 
           {/* Assistant IA PDF */}
-          <Link href="/ai-pdf">
-            <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer border-2 border-transparent hover:border-purple-500">
+          <Link href="/ai-pdf" className="block h-full">
+            <div className="h-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer border-2 border-transparent hover:border-purple-500 dark:hover:border-purple-400 min-h-[220px]">
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
                 <svg
                   className="w-6 h-6 text-purple-600"
@@ -78,18 +78,18 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
+              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                 Assistant IA PDF
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 Posez des questions sur vos documents de certification
               </p>
             </div>
           </Link>
 
           {/* Gestion du stock */}
-          <Link href="/gestion">
-            <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer border-2 border-transparent hover:border-cyan-500">
+          <Link href="/gestion" className="block h-full">
+            <div className="h-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer border-2 border-transparent hover:border-cyan-500 dark:hover:border-cyan-400 min-h-[220px]">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <svg
                   className="w-6 h-6 text-blue-600"
@@ -105,10 +105,10 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
+              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                 Gestion des données
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 Ajoutez, modifiez et supprimez vos installations et articles de
                 stock
               </p>
@@ -116,7 +116,7 @@ export default function Home() {
           </Link>
 
           {/* Statistiques */}
-          <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer border-2 border-transparent hover:border-cyan-500">
+          <div className="h-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer border-2 border-transparent hover:border-cyan-500 dark:hover:border-cyan-400 min-h-[220px]">
             <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
               <svg
                 className="w-6 h-6 text-indigo-600"
@@ -132,10 +132,10 @@ export default function Home() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">
+            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
               Statistiques
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               Visualisez les rapports et statistiques de votre activité
             </p>
             <span className="inline-block mt-3 text-sm text-gray-500 italic">
@@ -146,24 +146,30 @@ export default function Home() {
 
         {/* Section statistiques rapides */}
         <div className="mt-16 max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">
               Aperçu rapide
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
                 <div className="text-4xl font-bold text-cyan-600 mb-2">50+</div>
-                <div className="text-gray-600">Articles en stock</div>
+                <div className="text-gray-600 dark:text-gray-300">
+                  Articles en stock
+                </div>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold text-blue-600 mb-2">2</div>
-                <div className="text-gray-600">Installations actives</div>
+                <div className="text-gray-600 dark:text-gray-300">
+                  Installations actives
+                </div>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold text-indigo-600 mb-2">
                   IA
                 </div>
-                <div className="text-gray-600">Assistant intelligent</div>
+                <div className="text-gray-600 dark:text-gray-300">
+                  Assistant intelligent
+                </div>
               </div>
             </div>
           </div>

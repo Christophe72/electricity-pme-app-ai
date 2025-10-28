@@ -43,7 +43,7 @@ export default function AIPdfPage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-cyan-50 to-blue-50">
+    <div className="min-h-screen bg-linear-to-br from-cyan-50 to-blue-50 dark:from-gray-900 dark:to-gray-950">
       <div className="container mx-auto px-4 py-8">
         {/* En-tête */}
         <div className="mb-8">
@@ -53,20 +53,20 @@ export default function AIPdfPage() {
           >
             ← Retour à l&apos;accueil
           </Link>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
             Assistant IA - Lecture de PDF
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             Posez des questions sur votre document de certification
           </p>
         </div>
 
         {/* Contenu principal */}
         <div className="max-w-3xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg p-6 space-y-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 space-y-6 border border-gray-200 dark:border-gray-700">
             {/* Zone de question */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                 Votre question
               </label>
               <textarea
@@ -78,7 +78,7 @@ export default function AIPdfPage() {
                   }
                 }}
                 placeholder="Exemple : Quelles sont les conditions de certification ?&#10;&#10;Appuyez sur Ctrl+Entrée pour envoyer"
-                className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none"
+                className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none"
                 rows={4}
                 disabled={loading}
               />
@@ -136,7 +136,7 @@ export default function AIPdfPage() {
 
             {/* Message d'erreur */}
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
                 <div className="flex items-start gap-3">
                   <svg
                     className="w-5 h-5 text-red-500 mt-0.5"
@@ -150,12 +150,16 @@ export default function AIPdfPage() {
                     />
                   </svg>
                   <div>
-                    <strong className="text-red-800 font-medium">Erreur</strong>
-                    <p className="text-red-700 mt-1">{error}</p>
+                    <strong className="text-red-800 dark:text-red-200 font-medium">
+                      Erreur
+                    </strong>
+                    <p className="text-red-700 dark:text-red-300 mt-1">
+                      {error}
+                    </p>
                     {error.includes("non trouvé") && (
                       <p className="text-red-600 text-sm mt-2">
                         💡 Astuce : Placez votre fichier PDF dans le dossier{" "}
-                        <code className="bg-red-100 px-2 py-1 rounded">
+                        <code className="bg-red-100 dark:bg-red-900/50 px-2 py-1 rounded">
                           /public/certification.pdf
                         </code>
                       </p>
@@ -167,7 +171,7 @@ export default function AIPdfPage() {
 
             {/* Réponse */}
             {answer && (
-              <div className="p-6 bg-linear-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+              <div className="p-6 bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
                 <div className="flex items-start gap-3">
                   <svg
                     className="w-6 h-6 text-cyan-600 mt-0.5 shrink-0"
@@ -183,10 +187,10 @@ export default function AIPdfPage() {
                     />
                   </svg>
                   <div className="flex-1">
-                    <strong className="text-gray-800 font-semibold text-lg block mb-3">
+                    <strong className="text-gray-800 dark:text-gray-100 font-semibold text-lg block mb-3">
                       Réponse :
                     </strong>
-                    <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                    <div className="text-gray-700 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">
                       {answer}
                     </div>
                   </div>
@@ -196,8 +200,8 @@ export default function AIPdfPage() {
           </div>
 
           {/* Exemples de questions */}
-          <div className="mt-8 bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
               💡 Exemples de questions
             </h2>
             <div className="space-y-2">
@@ -211,7 +215,7 @@ export default function AIPdfPage() {
                 <button
                   key={exampleQuestion}
                   onClick={() => setQuestion(exampleQuestion)}
-                  className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-cyan-50 border border-gray-200 hover:border-cyan-300 rounded-lg transition-colors text-gray-700 hover:text-cyan-700"
+                  className="w-full text-left px-4 py-3 bg-gray-50 dark:bg-gray-900 hover:bg-cyan-50 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-cyan-300 rounded-lg transition-colors text-gray-700 dark:text-gray-200 hover:text-cyan-700"
                   disabled={loading}
                 >
                   <span className="text-cyan-600 mr-2">→</span>
@@ -222,7 +226,7 @@ export default function AIPdfPage() {
           </div>
 
           {/* Informations de sécurité */}
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
             <div className="flex gap-3">
               <svg
                 className="w-5 h-5 text-blue-600 mt-0.5 shrink-0"
