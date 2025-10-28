@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { PDFExtract } from "pdf.js-extract";
+import { NextRequest, NextResponse } from "next/server";
 
 interface PDFItem {
   str: string;
@@ -41,5 +42,27 @@ export async function readPdfText(filename: string): Promise<string> {
   } catch (error) {
     console.error("Error reading PDF:", error);
     throw new Error("Failed to read PDF file");
+  }
+}
+
+// GET /api/pdf/read?file=monfichier.pdf
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const file = searchParams.get("file");
+    if (!file) {
+      return NextResponse.json(
+        { error: "Paramètre 'file' requis" },
+        { status: 400 }
+      );
+    }
+    const text = await readPdfText(file);
+    return NextResponse.json({ text });
+  } catch (error) {
+    console.error("Erreur API /api/pdf/read:", error);
+    return NextResponse.json(
+      { error: "Impossible de lire le PDF" },
+      { status: 500 }
+    );
   }
 }
