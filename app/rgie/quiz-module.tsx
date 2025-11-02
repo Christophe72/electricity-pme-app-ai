@@ -71,16 +71,12 @@ const QUESTIONS: Question[] = [
   },
 ];
 
-const DEFAULT_CREDENTIALS = {
-  email: "formation@electricity-pme.fr",
-  password: "rgie2025",
-};
-
 export default function QuizModule() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [answers, setAnswers] = useState<AnswerMap>(() =>
     Object.fromEntries(QUESTIONS.map((question) => [question.id, null]))
   );
@@ -106,17 +102,41 @@ export default function QuizModule() {
     }, 0);
   }, [answers, isSubmitted]);
 
-  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (
-      email.trim().toLowerCase() === DEFAULT_CREDENTIALS.email &&
-      password === DEFAULT_CREDENTIALS.password
-    ) {
-      setIsAuthenticated(true);
-      setLoginError(null);
-    } else {
-      setLoginError("Identifiants incorrects. Merci de vérifier vos accès.");
+    setIsAuthenticating(true);
+
+    try {
+      const response = await fetch("/api/rgie/auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        }),
+      });
+
+      if (response.ok) {
+        setIsAuthenticated(true);
+        setLoginError(null);
+      } else {
+        const { message } = (await response.json().catch(() => ({}))) as {
+          message?: string;
+        };
+        setLoginError(
+          message ?? "Identifiants incorrects. Merci de vérifier vos accès."
+        );
+      }
+    } catch (error) {
+      console.error("RGIE authentication failed", error);
+      setLoginError(
+        "Impossible de vérifier vos accès pour le moment. Veuillez réessayer."
+      );
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
@@ -212,9 +232,10 @@ export default function QuizModule() {
                   ) : null}
                   <button
                     type="submit"
-                    className="w-full rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 transition-colors"
+                    disabled={isAuthenticating}
+                    className="w-full rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-400 disabled:cursor-not-allowed text-white font-semibold py-3 transition-colors"
                   >
-                    Accéder au module
+                    {isAuthenticating ? "Vérification..." : "Accéder au module"}
                   </button>
                 </form>
                 <div className="rounded-lg bg-emerald-50 dark:bg-emerald-900/40 border border-emerald-100 dark:border-emerald-800 p-4 text-left">
