@@ -1,90 +1,89 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
-type Question = {
-  id: number;
-  prompt: string;
-  choices: string[];
-  answerIndex: number;
-  explanation: string;
-};
+import type { Question } from "@/lib/rgie/questions";
 
 type AnswerMap = Record<number, number | null>;
 
-const QUESTIONS: Question[] = [
-  {
-    id: 1,
-    prompt:
-      "Quelle est la première étape à réaliser avant toute intervention sur une installation électrique selon le RGIE ?",
-    choices: [
-      "Couper l'alimentation générale et vérifier l'absence de tension",
-      "Préparer le rapport d'intervention",
-      "Identifier le matériel à remplacer",
-      "Informer le client de la durée de l'intervention",
-    ],
-    answerIndex: 0,
-    explanation:
-      "Le RGIE impose de mettre l'installation hors tension et de vérifier l'absence de tension avant d'intervenir.",
-  },
-  {
-    id: 2,
-    prompt: "Quel document doit être fourni au client après une nouvelle installation domestique ?",
-    choices: [
-      "Un certificat de conformité RGIE",
-      "La facture détaillée du matériel utilisé",
-      "La liste complète des normes appliquées",
-      "Un plan unifilaire et un schéma de position",
-    ],
-    answerIndex: 3,
-    explanation:
-      "Le RGIE exige la remise d'un plan unifilaire et d'un schéma de position pour toute nouvelle installation.",
-  },
-  {
-    id: 3,
-    prompt:
-      "Quel est l'appareil indispensable pour protéger les personnes contre les contacts indirects ?",
-    choices: [
-      "Le disjoncteur différentiel",
-      "Le contacteur modulaire",
-      "Le relais thermique",
-      "Le parafoudre",
-    ],
-    answerIndex: 0,
-    explanation:
-      "Les dispositifs différentiels à haute sensibilité sont obligatoires pour prévenir les contacts indirects.",
-  },
-  {
-    id: 4,
-    prompt:
-      "Quelle périodicité de contrôle est recommandée pour les installations des PME à risque élevé ?",
-    choices: [
-      "Tous les ans",
-      "Tous les deux ans",
-      "Tous les cinq ans",
-      "Uniquement lors d'une modification majeure",
-    ],
-    answerIndex: 0,
-    explanation:
-      "Pour les environnements à risque, une vérification annuelle est généralement requise pour rester conforme au RGIE.",
-  },
-];
-
-const DEFAULT_CREDENTIALS = {
-  email: "formation@electricity-pme.fr",
-  password: "rgie2025",
-};
+function buildEmptyAnswers(questions: Question[]): AnswerMap {
+  return Object.fromEntries(questions.map((question) => [question.id, null]));
+}
 
 export default function QuizModule() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
-  const [answers, setAnswers] = useState<AnswerMap>(() =>
-    Object.fromEntries(QUESTIONS.map((question) => [question.id, null]))
-  );
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [questions, setQuestions] = useState<Question[] | null>(null);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(true);
+  const [answers, setAnswers] = useState<AnswerMap>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const loadQuestions = useCallback(async () => {
+    setIsLoadingQuestions(true);
+
+    try {
+      const response = await fetch("/api/rgie/quiz", {
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const { questions: fetchedQuestions } = (await response.json()) as {
+          questions: Question[];
+        };
+
+        setQuestions(fetchedQuestions);
+        setIsAuthenticated(true);
+        setLoginError(null);
+      } else if (response.status === 401) {
+        const { message } = (await response.json().catch(() => ({}))) as {
+          message?: string;
+        };
+
+        setQuestions(null);
+        setIsAuthenticated(false);
+        setLoginError(
+          message && message !== "Authentification requise." ? message : null
+        );
+      } else {
+        const { message } = (await response.json().catch(() => ({}))) as {
+          message?: string;
+        };
+
+        setQuestions(null);
+        setIsAuthenticated(false);
+        setLoginError(
+          message ?? "Impossible de récupérer le module pour le moment."
+        );
+      }
+    } catch (error) {
+      console.error("Impossible de charger le module RGIE", error);
+      setQuestions(null);
+      setIsAuthenticated(false);
+      setLoginError(
+        "Impossible de récupérer le module pour le moment. Veuillez réessayer."
+      );
+    } finally {
+      setIsLoadingQuestions(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadQuestions();
+  }, [loadQuestions]);
+
+  useEffect(() => {
+    if (questions && questions.length > 0) {
+      setAnswers(buildEmptyAnswers(questions));
+    } else {
+      setAnswers({});
+    }
+
+    setIsSubmitted(false);
+  }, [questions]);
 
   const answeredCount = useMemo(
     () =>
@@ -96,31 +95,62 @@ export default function QuizModule() {
   );
 
   const score = useMemo(() => {
-    if (!isSubmitted) {
+    if (!isSubmitted || !questions) {
       return 0;
     }
 
-    return QUESTIONS.reduce((total, question) => {
+    return questions.reduce((total, question) => {
       const userAnswer = answers[question.id];
       return userAnswer === question.answerIndex ? total + 1 : total;
     }, 0);
-  }, [answers, isSubmitted]);
+  }, [answers, isSubmitted, questions]);
 
-  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (
-      email.trim().toLowerCase() === DEFAULT_CREDENTIALS.email &&
-      password === DEFAULT_CREDENTIALS.password
-    ) {
-      setIsAuthenticated(true);
-      setLoginError(null);
-    } else {
-      setLoginError("Identifiants incorrects. Merci de vérifier vos accès.");
+    setLoginError(null);
+    setIsAuthenticating(true);
+
+    try {
+      const response = await fetch("/api/rgie/auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        }),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        setEmail("");
+        setPassword("");
+        await loadQuestions();
+      } else {
+        const { message } = (await response.json().catch(() => ({}))) as {
+          message?: string;
+        };
+        setLoginError(
+          message ?? "Identifiants incorrects. Merci de vérifier vos accès."
+        );
+      }
+    } catch (error) {
+      console.error("RGIE authentication failed", error);
+      setLoginError(
+        "Impossible de vérifier vos accès pour le moment. Veuillez réessayer."
+      );
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
   const handleAnswerChange = (questionId: number, choiceIndex: number) => {
+    if (!questions) {
+      return;
+    }
+
     setAnswers((current) => ({
       ...current,
       [questionId]: choiceIndex,
@@ -129,15 +159,21 @@ export default function QuizModule() {
 
   const handleSubmitQuiz = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsSubmitted(true);
+    if (questions && questions.length > 0) {
+      setIsSubmitted(true);
+    }
   };
 
   const handleReset = () => {
-    setAnswers(
-      Object.fromEntries(QUESTIONS.map((question) => [question.id, null]))
-    );
+    if (!questions) {
+      return;
+    }
+
+    setAnswers(buildEmptyAnswers(questions));
     setIsSubmitted(false);
   };
+
+  const totalQuestions = questions?.length ?? 0;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-emerald-50 via-slate-50 to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
@@ -158,7 +194,14 @@ export default function QuizModule() {
 
         <div className="grid gap-8 md:grid-cols-[1fr_minmax(280px,360px)] items-start">
           <section className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-emerald-100 dark:border-gray-800 p-8">
-            {!isAuthenticated ? (
+            {isLoadingQuestions ? (
+              <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+                <span className="h-12 w-12 animate-spin rounded-full border-4 border-emerald-200 border-t-emerald-500" aria-hidden />
+                <p className="text-gray-700 dark:text-gray-300">
+                  Chargement du module sécurisé RGIE...
+                </p>
+              </div>
+            ) : !isAuthenticated ? (
               <div className="space-y-6">
                 <div className="space-y-3 text-left">
                   <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
@@ -212,9 +255,10 @@ export default function QuizModule() {
                   ) : null}
                   <button
                     type="submit"
-                    className="w-full rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 transition-colors"
+                    disabled={isAuthenticating}
+                    className="w-full rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-400 disabled:cursor-not-allowed text-white font-semibold py-3 transition-colors"
                   >
-                    Accéder au module
+                    {isAuthenticating ? "Vérification..." : "Accéder au module"}
                   </button>
                 </form>
                 <div className="rounded-lg bg-emerald-50 dark:bg-emerald-900/40 border border-emerald-100 dark:border-emerald-800 p-4 text-left">
@@ -234,14 +278,14 @@ export default function QuizModule() {
                     Questionnaire
                   </h2>
                   <p className="text-gray-600 dark:text-gray-300">
-                    {answeredCount === QUESTIONS.length
+                    {answeredCount === totalQuestions && totalQuestions > 0
                       ? "Toutes les questions sont renseignées. Validez pour obtenir votre score."
-                      : `Questions répondues : ${answeredCount}/${QUESTIONS.length}.`}
+                      : `Questions répondues : ${answeredCount}/${totalQuestions}.`}
                   </p>
                 </div>
 
                 <div className="space-y-6">
-                  {QUESTIONS.map((question) => (
+                  {questions?.map((question) => (
                     <fieldset
                       key={question.id}
                       className="space-y-4 rounded-xl border border-gray-200 dark:border-gray-800 p-5"
@@ -322,7 +366,7 @@ export default function QuizModule() {
                 {isSubmitted ? (
                   <div className="rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-900/40 p-6 text-center space-y-3">
                     <p className="text-lg font-semibold text-emerald-700 dark:text-emerald-300">
-                      Score obtenu : {score}/{QUESTIONS.length}
+                      Score obtenu : {score}/{totalQuestions}
                     </p>
                     <p className="text-sm text-emerald-700/80 dark:text-emerald-200/80">
                       Analysez les explications pour consolider les bonnes
