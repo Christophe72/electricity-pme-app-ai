@@ -115,6 +115,34 @@ export default function Home() {
             </div>
           </Link>
 
+          {/* Module RGIE */}
+          <Link href="/rgie" className="block h-full">
+            <div className="h-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer border-2 border-transparent hover:border-emerald-500 dark:hover:border-emerald-400 min-h-[220px]">
+              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
+                <svg
+                  className="w-6 h-6 text-emerald-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6l4 2"
+                  />
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth={2} />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                Module RGIE
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Testez vos connaissances réglementaires grâce au module de formation interne.
+              </p>
+            </div>
+          </Link>
+
           {/* Statistiques */}
           <div className="h-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer border-2 border-transparent hover:border-cyan-500 dark:hover:border-cyan-400 min-h-[220px]">
             <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
