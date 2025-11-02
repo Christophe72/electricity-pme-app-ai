@@ -10,7 +10,7 @@
 - **Assistant IA** pour répondre aux questions sur le contenu du PDF
 - **Base de données Prisma** (SQLite) avec seed de matériel récurrent
 - **Gestion des installations et du stock** (CRUD complet)
-- **Pages interactives** : accueil, IA PDF, IA stock, gestion
+- **Pages interactives** : accueil, IA PDF, IA stock, gestion, module RGIE
 - **Design responsive avec Tailwind CSS v4**
 
 ---
@@ -47,6 +47,7 @@
    - Assistant IA PDF : [http://localhost:3000/ai-pdf](http://localhost:3000/ai-pdf)
    - Assistant IA Stock : [http://localhost:3000/ai-stock](http://localhost:3000/ai-stock)
    - Gestion : [http://localhost:3000/gestion](http://localhost:3000/gestion)
+   - Module RGIE : [http://localhost:3000/rgie](http://localhost:3000/rgie)
 
 ---
 
@@ -90,9 +91,28 @@ export async function parsePDF(dataBuffer: Buffer): Promise<PDFData> {
 - `app/api/ai/stock/route.ts` : Route API Next.js connectée à OpenAI et Prisma
 - `app/api/installations/route.ts` : API CRUD installations
 - `app/api/stock/route.ts` : API CRUD stock
+- `app/rgie/page.tsx` & `app/rgie/quiz-module.tsx` : Module de quiz RGIE avec authentification intégrée
 - `prisma/schema.prisma` : Modèles Installation et StockItem
 - `prisma/seed.ts` : Script de seed avec matériel électrique récurrent
 - `lib/prisma.ts` : Client Prisma pour Next.js
+
+---
+
+## 🧠 Module RGIE (Quiz)
+
+- **Accès** : [http://localhost:3000/rgie](http://localhost:3000/rgie)
+- **Objectif** : entraîner les équipes aux bonnes pratiques du RGIE avec un quiz interactif.
+- **Connexion par défaut** :
+
+  ```
+  E-mail    : formation@electricity-pme.fr
+  Mot de passe : rgie2025
+  ```
+
+- **Fonctionnalités** :
+  - Authentification côté client avant l'accès au questionnaire.
+  - 4 questions à choix multiples avec explications détaillées après validation.
+  - Récapitulatif du score et rappels pédagogiques.
 
 ---
 
