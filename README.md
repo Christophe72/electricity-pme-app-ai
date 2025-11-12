@@ -122,12 +122,76 @@ export async function parsePDF(dataBuffer: Buffer): Promise<PDFData> {
 
 ---
 
+
 ## 📝 Fonctionnalités récentes
 
 - Extraction PDF robuste (Node.js only)
 - Correction des erreurs liées à DOMMatrix/canvas
 - Assistant IA PDF et Stock
 - Gestion visuelle du stock et des installations (CRUD)
+- Correction du bug `NaN` dans les inputs numériques du stock
+- Ajout de la page `app/gestion/propositions/page.tsx` pour la gestion des propositions
+
+---
+
+## 🐞 Correction du bug NaN dans les formulaires
+
+Un bug provoquait l'affichage d'une erreur React :
+```
+Received NaN for the `value` attribute. If this is expected, cast the value to a string.
+```
+Ce problème survenait lorsque l'utilisateur effaçait le champ numérique (quantité ou seuil), ce qui donnait une valeur `NaN` non supportée par React.
+
+**Correction apportée :**
+```tsx
+onChange={(e) =>
+   setStockForm({
+      ...stockForm,
+      quantite: parseInt(e.target.value) || 0,
+   })
+}
+```
+La même logique est appliquée au champ `seuil`. Ainsi, si le champ est vide, la valeur devient `0` au lieu de `NaN`.
+
+---
+
+## 🔢 Gestion des valeurs numériques dans les formulaires
+
+Pour tous les inputs de type `number`, la valeur du state est toujours un nombre valide (jamais `NaN`).
+
+- Utilisation de `parseInt(e.target.value) || 0` pour garantir une valeur numérique
+- Empêche les erreurs React et améliore la robustesse UX
+
+---
+
+## 🆕 Nouveaux modules/pages
+
+- `app/gestion/propositions/page.tsx` : gestion des propositions
+- Dossiers API étendus pour la gestion des stocks et installations
+
+---
+
+## 🚀 Déploiement & Configuration IA
+
+### Déploiement local
+
+1. Installer les dépendances : `npm install`
+2. Générer la base Prisma : `npx prisma generate && npx prisma db push && npm run seed`
+3. Lancer le serveur : `npm run dev`
+
+### Configuration IA
+
+- La clé OpenAI doit être définie dans les variables d'environnement (`.env.local`)
+- Le modèle utilisé est configurable dans le code (`gpt-4o-mini` par défaut)
+- Les routes API `/api/ai/pdf` et `/api/ai/stock` gèrent les requêtes IA
+
+### Déploiement production
+
+- Prévoir une base de données adaptée (PostgreSQL, MySQL, etc.)
+- Configurer la clé OpenAI côté serveur
+- Adapter le chemin du PDF si besoin
+
+---
 
 ---
 

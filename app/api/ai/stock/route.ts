@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     
     Analyse le stock et réponds à la question suivante de manière simple et claire.
     Si la question concerne les seuils, considère que le seuil minimum est indiqué pour chaque article.
-    
+    Prends les normes du RGIE et vinçotte comme reference pour la législation des installations électriques en Belgique
     Question : ${question}
     
     Réponds en français et sois précis dans tes calculs.
