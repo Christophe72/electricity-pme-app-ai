@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 type Installation = {
@@ -64,6 +64,11 @@ const ORDER_STATUS_STYLES: Record<
     "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200",
 };
 
+const STORAGE_KEYS = {
+  manual: "gestion:commandes:manualQty",
+  selected: "gestion:commandes:selected",
+};
+
 export default function GestionPage() {
   const [activeTab, setActiveTab] = useState<
     "installations" | "stock" | "commandes"
@@ -93,6 +98,9 @@ export default function GestionPage() {
   const [manualQuantities, setManualQuantities] = useState<
     Record<number, number>
   >({});
+  const [selectedItems, setSelectedItems] = useState<Record<number, boolean>>(
+    {}
+  );
   const suggestionsWithManual = commandSuggestions.map((suggestion) => {
     const manualQtyRaw =
       manualQuantities[suggestion.id] ?? suggestion.aCommander;
@@ -100,15 +108,98 @@ export default function GestionPage() {
       0,
       Number.isFinite(manualQtyRaw) ? Math.round(manualQtyRaw) : 0
     );
-    return { ...suggestion, manualQty };
+    const selected = selectedItems[suggestion.id] ?? true;
+    return { ...suggestion, manualQty, selected };
   });
   const actionableSuggestions = suggestionsWithManual.filter(
-    (suggestion) => suggestion.manualQty > 0
+    (suggestion) => suggestion.selected && suggestion.manualQty > 0
   );
   const totalQuantityToOrder = actionableSuggestions.reduce(
     (total, suggestion) => total + suggestion.manualQty,
     0
   );
+  const allSelected =
+    suggestionsWithManual.length > 0 &&
+    suggestionsWithManual.every((suggestion) => suggestion.selected);
+  const someSelected = suggestionsWithManual.some(
+    (suggestion) => suggestion.selected
+  );
+  const selectAllRef = useRef<HTMLInputElement>(null);
+  const resetToastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showResetToast, setShowResetToast] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const storedManual = window.localStorage.getItem(STORAGE_KEYS.manual);
+      if (storedManual) {
+        const parsed = JSON.parse(storedManual);
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          const sanitized: Record<number, number> = {};
+          for (const [key, value] of Object.entries(parsed)) {
+            const numKey = Number(key);
+            const numValue = Number(value);
+            if (Number.isFinite(numKey) && Number.isFinite(numValue)) {
+              sanitized[numKey] = numValue;
+            }
+          }
+          if (Object.keys(sanitized).length) {
+            setManualQuantities(sanitized);
+          }
+        }
+      }
+
+      const storedSelection = window.localStorage.getItem(
+        STORAGE_KEYS.selected
+      );
+      if (storedSelection) {
+        const parsed = JSON.parse(storedSelection);
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          const sanitized: Record<number, boolean> = {};
+          for (const [key, value] of Object.entries(parsed)) {
+            const numKey = Number(key);
+            if (Number.isFinite(numKey)) {
+              sanitized[numKey] = Boolean(value);
+            }
+          }
+          if (Object.keys(sanitized).length) {
+            setSelectedItems(sanitized);
+          }
+        }
+      }
+    } catch (error) {
+      console.warn("Impossible de restaurer les réglages locaux:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(
+      STORAGE_KEYS.manual,
+      JSON.stringify(manualQuantities)
+    );
+  }, [manualQuantities]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(
+      STORAGE_KEYS.selected,
+      JSON.stringify(selectedItems)
+    );
+  }, [selectedItems]);
+
+  useEffect(() => {
+    if (!selectAllRef.current) return;
+    selectAllRef.current.indeterminate = !allSelected && someSelected;
+  }, [allSelected, someSelected, suggestionsWithManual.length]);
+
+  useEffect(() => {
+    return () => {
+      if (resetToastTimer.current) {
+        clearTimeout(resetToastTimer.current);
+      }
+    };
+  }, []);
 
   // Formulaire Installation
   const [installationForm, setInstallationForm] = useState({
@@ -132,8 +223,13 @@ export default function GestionPage() {
   }, [activeTab, orderMode, orderMultiplier]);
 
   useEffect(() => {
-    if (commandSuggestions.length === 0) {
-      setManualQuantities((prev) => (Object.keys(prev).length ? {} : prev));
+    if (!commandSuggestions.length) {
+      setManualQuantities((prev) =>
+        Object.keys(prev).length ? {} : prev
+      );
+      setSelectedItems((prev) =>
+        Object.keys(prev).length ? {} : prev
+      );
       return;
     }
     setManualQuantities((prev) => {
@@ -152,6 +248,30 @@ export default function GestionPage() {
         let identical = true;
         for (const item of commandSuggestions) {
           if (next[item.id] !== prev[item.id]) {
+            identical = false;
+            break;
+          }
+        }
+        if (identical) {
+          return prev;
+        }
+      }
+
+      return next;
+    });
+    setSelectedItems((prev) => {
+      const next: Record<number, boolean> = {};
+      for (const item of commandSuggestions) {
+        next[item.id] =
+          typeof prev[item.id] === "boolean" ? prev[item.id] : true;
+      }
+
+      const sameLength =
+        Object.keys(next).length === Object.keys(prev).length;
+      if (sameLength) {
+        let identical = true;
+        for (const item of commandSuggestions) {
+          if ((prev[item.id] ?? true) !== next[item.id]) {
             identical = false;
             break;
           }
@@ -329,6 +449,10 @@ export default function GestionPage() {
       setCreatingOrder(validate ? "validate" : "save");
       const itemsPayload = commandSuggestions
         .map((item) => {
+          const isSelected = selectedItems[item.id] ?? true;
+          if (!isSelected) {
+            return null;
+          }
           const value =
             manualQuantities[item.id] ?? item.aCommander;
           const safeValue = Math.max(
@@ -337,7 +461,10 @@ export default function GestionPage() {
           );
           return { stockItemId: item.id, quantity: safeValue };
         })
-        .filter((item) => item.quantity > 0);
+        .filter(
+          (item): item is { stockItemId: number; quantity: number } =>
+            !!item && item.quantity > 0
+        );
 
       if (!itemsPayload.length) {
         setOrderError(
@@ -376,6 +503,38 @@ export default function GestionPage() {
     } finally {
       setCreatingOrder("none");
     }
+  };
+
+  const resetAdjustments = () => {
+    if (!commandSuggestions.length) {
+      setManualQuantities({});
+      setSelectedItems({});
+      setShowResetToast(true);
+      if (resetToastTimer.current) {
+        clearTimeout(resetToastTimer.current);
+      }
+      resetToastTimer.current = setTimeout(() => {
+        setShowResetToast(false);
+      }, 3000);
+      return;
+    }
+    const defaultsManual: Record<number, number> = {};
+    const defaultsSelected: Record<number, boolean> = {};
+
+    commandSuggestions.forEach((item) => {
+      defaultsManual[item.id] = item.aCommander;
+      defaultsSelected[item.id] = true;
+    });
+
+    setManualQuantities(defaultsManual);
+    setSelectedItems(defaultsSelected);
+    setShowResetToast(true);
+    if (resetToastTimer.current) {
+      clearTimeout(resetToastTimer.current);
+    }
+    resetToastTimer.current = setTimeout(() => {
+      setShowResetToast(false);
+    }, 3000);
   };
 
   // Charger les installations pour le sélecteur
@@ -894,6 +1053,14 @@ export default function GestionPage() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <button
+                    type="button"
+                    onClick={resetAdjustments}
+                    disabled={suggestionsWithManual.length === 0}
+                    className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-60"
+                  >
+                    Réinitialiser les ajustements
+                  </button>
+                  <button
                     onClick={() => handleCreateOrder(false)}
                     disabled={
                       creatingOrder !== "none" || totalQuantityToOrder === 0
@@ -929,6 +1096,12 @@ export default function GestionPage() {
               {orderError && (
                 <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-950/40 dark:text-red-200">
                   {orderError}
+                </div>
+              )}
+
+              {showResetToast && (
+                <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-500/30 dark:bg-green-900/30 dark:text-green-100">
+                  Ajustements réinitialisés avec succès.
                 </div>
               )}
 
@@ -1003,6 +1176,28 @@ export default function GestionPage() {
                     <table className="min-w-full text-sm">
                       <thead className="bg-gray-50 dark:bg-gray-900">
                         <tr>
+                          <th className="p-3 text-center w-12">
+                            <input
+                              ref={selectAllRef}
+                              type="checkbox"
+                              checked={allSelected}
+                              disabled={suggestionsWithManual.length === 0}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setSelectedItems((prev) => {
+                                  const next: Record<number, boolean> = {
+                                    ...prev,
+                                  };
+                                  suggestionsWithManual.forEach((item) => {
+                                    next[item.id] = checked;
+                                  });
+                                  return next;
+                                });
+                              }}
+                              className="h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 disabled:opacity-40"
+                              aria-label="Sélectionner tout"
+                            />
+                          </th>
                           <th className="p-3 text-left">Article</th>
                           <th className="p-3 text-left">Installation</th>
                           <th className="p-3 text-right">Qté</th>
@@ -1020,6 +1215,20 @@ export default function GestionPage() {
                             key={item.id}
                             className="border-t border-gray-100 dark:border-gray-800"
                           >
+                            <td className="p-3 text-center">
+                              <input
+                                type="checkbox"
+                                checked={item.selected}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  setSelectedItems((prev) => ({
+                                    ...prev,
+                                    [item.id]: checked,
+                                  }));
+                                }}
+                                className="h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                              />
+                            </td>
                             <td className="p-3 font-medium text-gray-800 dark:text-gray-100">
                               {item.nom}
                             </td>
@@ -1055,7 +1264,7 @@ export default function GestionPage() {
                   </div>
                 )}
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Ajustez la colonne « Qté retenue » avant d&apos;enregistrer pour affiner la commande.
+                  Décochez les lignes à exclure et ajustez la colonne « Qté retenue » avant d&apos;enregistrer.
                 </p>
               </section>
 
