@@ -5,7 +5,8 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Début du seeding...");
 
-  // Supprime les données existantes (optionnel)
+  // Supprime les données existantes dans l'ordre des dépendances
+  await prisma.proposalItem.deleteMany();
   await prisma.stockItem.deleteMany();
   await prisma.installation.deleteMany();
 

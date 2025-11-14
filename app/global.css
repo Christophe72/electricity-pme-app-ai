@@ -1,1 +1,103 @@
 @import "tailwindcss";
+
+/* Définition du box-sizing pour tous les éléments */
+* {
+  box-sizing: border-box;
+}
+
+/* Hauteur 100% pour html et body, suppression des marges et police par défaut */
+html, body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Inter, system-ui, Arial, sans-serif;
+}
+
+/* Variables CSS pour les couleurs principales du thème */
+:root {
+  --bg: #0b1220;         /* Couleur de fond principale */
+  --panel: #0f172a;      /* Couleur des panneaux latéraux */
+  --muted: #94a3b8;      /* Couleur des textes secondaires */
+  --text: #e5e7eb;       /* Couleur du texte principal */
+  --line: #475569;       /* Couleur des bordures */
+}
+
+/* Mise en page principale en grille avec une sidebar et un contenu */
+.wrapper {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 12px;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Style de la barre latérale */
+.sidebar {
+  background: var(--panel);
+  padding: 12px;
+  border-right: 1px solid var(--line);
+}
+
+/* Style du contenu principal */
+.main {
+  padding: 12px;
+}
+
+/* Boutons stylisés */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #111827;
+  color: #e5e7eb;
+  cursor: pointer;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+
+/* Élément de légende pour les symboles */
+.legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+/* Grille de fond pour les plans d'implantation */
+.grid {
+  background: repeating-linear-gradient(0deg, transparent, transparent 9mm, rgba(148,163,184,.2) 9mm, rgba(148,163,184,.2) 9.2mm),
+              repeating-linear-gradient(90deg, transparent, transparent 9mm, rgba(148,163,184,.2) 9mm, rgba(148,163,184,.2) 9.2mm);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+/* Badge d'information */
+.badge {
+  font-size: 12px;
+  padding: 2px 6px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: #e2e8f0;
+  background: #0b1220;
+}
+
+/* Note explicative */
+.note {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Empêche la sélection du texte dans les SVG */
+svg text {
+  -webkit-user-select: none;
+  user-select: none;
+}

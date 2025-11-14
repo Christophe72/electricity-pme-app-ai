@@ -69,6 +69,48 @@ const QUESTIONS: Question[] = [
     explanation:
       "Pour les environnements à risque, une vérification annuelle est généralement requise pour rester conforme au RGIE.",
   },
+  {
+    id: 5,
+    prompt:
+      "Quel est le rôle principal du schéma unifilaire dans une installation électrique ?",
+    choices: [
+      "Décrire le câblage et les connexions de l'installation",
+      "Indiquer la puissance totale installée",
+      "Lister les équipements de protection individuelle",
+      "Déterminer la couleur des fils utilisés",
+    ],
+    answerIndex: 0,
+    explanation:
+      "Le schéma unifilaire permet de visualiser l'ensemble du câblage et des connexions pour garantir la conformité et faciliter les contrôles.",
+  },
+  {
+    id: 6,
+    prompt:
+      "Quel dispositif doit obligatoirement équiper les circuits de prises dans une installation domestique ?",
+    choices: [
+      "Un disjoncteur différentiel 30mA",
+      "Un relais thermique",
+      "Un contacteur jour/nuit",
+      "Un parafoudre",
+    ],
+    answerIndex: 0,
+    explanation:
+      "Le RGIE impose la présence d'un disjoncteur différentiel 30mA sur les circuits de prises pour protéger les personnes contre les risques électriques.",
+  },
+  {
+    id: 7,
+    prompt:
+      "Lors d'une modification d'une installation existante, que doit-on vérifier avant la remise en service ?",
+    choices: [
+      "La conformité des nouveaux éléments et l'absence de défaut d'isolement",
+      "La couleur des gaines utilisées",
+      "La présence d'un plan de masse",
+      "Le nombre de prises installées",
+    ],
+    answerIndex: 0,
+    explanation:
+      "Avant toute remise en service, il est obligatoire de vérifier la conformité des modifications et l'absence de défaut d'isolement pour garantir la sécurité.",
+  },
 ];
 
 const DEFAULT_CREDENTIALS = {
